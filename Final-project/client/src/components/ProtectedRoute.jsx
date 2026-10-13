@@ -1,0 +1,2 @@
+import {Navigate,useLocation} from 'react-router-dom';import {useAuth} from '../context/AuthContext';
+export default function ProtectedRoute({children,admin=false}){const {user,loading}=useAuth();const location=useLocation();if(loading)return <div className="min-h-screen grid place-items-center text-white bg-slate-950">Loading...</div>;if(!user)return <Navigate to="/login" state={{from:location.pathname}} replace/>;if(admin&&user.role!=='admin')return <Navigate to="/view" replace/>;return children;}

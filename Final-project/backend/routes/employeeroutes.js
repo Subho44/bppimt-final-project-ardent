@@ -1,0 +1,18 @@
+const express=require('express');
+const multer=require('multer');
+const path=require('path');
+const crypto=require('crypto');
+const fs=require('fs');
+const ctl=require('../controllers/employeecontroller');
+const {authenticate,adminOnly}=require('../middleware/auth');
+const router=express.Router();
+const folder=path.join(__dirname,'..','uploads'); fs.mkdirSync(folder,{recursive:true});
+const upload=multer({storage:multer.diskStorage({destination:folder,filename:(req,file,cb)=>cb(null,crypto.randomUUID()+({ 'image/jpeg':'.jpg','image/png':'.png','image/webp':'.webp','image/gif':'.gif'}[file.mimetype]||'.img'))}), limits:{fileSize:3*1024*1024,files:1}, fileFilter:(req,file,cb)=> cb(null,['image/jpeg','image/png','image/webp','image/gif'].includes(file.mimetype))});
+const image=(req,res,next)=>upload.single('image')(req,res,err=>err?res.status(400).json({message:err.code==='LIMIT_FILE_SIZE'?'Max image size is 3 MB':'Only one JPG, PNG, WEBP or GIF image is allowed'}):next());
+router.use(authenticate);
+router.get('/',ctl.getemp);
+router.get('/:id',ctl.singelemp);
+router.post('/',adminOnly,image,ctl.addemp);
+router.put('/:id',adminOnly,image,ctl.updateemp);
+router.delete('/:id',adminOnly,ctl.deleteemp);
+module.exports=router;
