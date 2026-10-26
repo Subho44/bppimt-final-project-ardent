@@ -6,6 +6,7 @@ app.use('/uploads',express.static(path.join(__dirname,'uploads')));
 app.get('/',(req,res)=>res.send('HR Portal API is working'));
 app.use('/api/auth',require('./routes/authroutes'));
 app.use('/api/employees',require('./routes/employeeroutes'));
+app.use('/api/ai',require('./routes/aiRoutes'));
 async function start(){await connectdb();
  if(process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD){const email=process.env.ADMIN_EMAIL.trim().toLowerCase();
   const exists=await User.findOne({email}); if(!exists){await User.create({name:process.env.ADMIN_NAME || 'Administrator',email,password:await bcrypt.hash(process.env.ADMIN_PASSWORD,12),role:'admin',isverified:true});console.log('Initial admin account created');}
